@@ -100,7 +100,7 @@
         <span>Página {{ currentPage }} de {{ totalPages }}</span>
 
         <!-- Botón "Siguiente" -->
-        <button @click="onPageChange(currentPage + 1)" :disabled="currentPage === totalPages || totalPages == 0">Siguiente</button>
+        <button @click="onPageChange(currentPage + 1)" :disabled="currentPage === totalPages">Siguiente</button>
       </div>
     </div>
   </div>
@@ -254,31 +254,47 @@ export default {
     onPageChange(page: number) {
       // Cambiar a la página seleccionada
       this.currentPage = page;
+      // Aplicar los filtros nuevamente para mostrar los productos de la nueva página
       this.applyFilters();
-      // Llamar al método para obtener los datos paginados
-      this.getPaginatedData();
     },
 
     getPaginatedData() {
       // Calcular los índices de los productos que se mostrarán en la página actual
-      const START_INDEX = (this.currentPage - 1) * this.perPage;
-      const END_INDEX = START_INDEX + this.perPage;
+      const startIndex = (this.currentPage - 1) * this.perPage;
+      const endIndex = startIndex + this.perPage;
       // Mostrar solo los productos de la página actual
-      this.products = this.products.slice(START_INDEX, END_INDEX);
-    },
+      this.filteredProducts = this.products.slice(startIndex, endIndex);
+    }
   },
   watch: {
     products() {
-      const OPERATION = Math.ceil(this.products.length / this.perPage);
-      if (OPERATION < this.perPage) {
-        console.log("IF");
-        this.totalPages = 1;
-      }else{
-        console.log("else");
-        this.totalPages = OPERATION;
-      }
-
+      this.totalPages = Math.ceil(this.products.length / this.perPage);
     },
+    perPage() {
+      this.totalPages = Math.ceil(this.products.length / this.perPage);
+    },
+    // Escuchar los cambios en los filtros y la página actual
+    selectedCategory() {
+      this.onPageChange(1);
+    },
+    selectedMinPercentage() {
+      this.onPageChange(1);
+    },
+    selectedMaxPercentage() {
+      this.onPageChange(1);
+    },
+    selectedRating() {
+      this.onPageChange(1);
+    },
+    selectedStock() {
+      this.onPageChange(1);
+    },
+    selectedBrand() {
+      this.onPageChange(1);
+    },
+    currentPage() {
+      this.getPaginatedData(); // Actualizar los productos cuando cambia la página
+    }
   },
   async mounted() {
     await this.getProducts();
