@@ -44,10 +44,10 @@ export default {
   name: "Menu",
   components: {
     shoppingCart,
-    close: Boolean,
   },
   props: {
       itemsAdded: Array,
+      cerrar: Boolean, 
     }, 
   data() {
     return {
@@ -57,10 +57,9 @@ export default {
   methods: {
     toggleCartVisibility() {
       this.isCartVisible = !this.isCartVisible;
-    },
-    closeModal() {
-      this.isCartVisible = false;
-    }
+      console.log("cerrar desde header", this.cerrar);
+      this.$emit('toggleCart',this.cerrar);
+    },   
   },
 };
 </script>

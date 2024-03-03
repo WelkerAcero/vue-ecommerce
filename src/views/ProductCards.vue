@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" />
+    <headerComponent :itemsAdded="itemStoredInCart" :cerrar="this.isCartVisible"/>
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -153,7 +153,7 @@ export default {
       skipPages: 0, //show the total amount of pages
     }
   },
-  methods: {
+  methods: {   
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -184,7 +184,7 @@ export default {
       }
     },
 
-    applyFilters() {
+    async applyFilters() {
       // Aplica los filtros seleccionados a la lista de productos
       let filteredList = [...this.products]; // Copia la lista original de productos
       // Aplica el filtro de precio
@@ -196,9 +196,8 @@ export default {
 
       // Aplica el filtro de categoría
       if (this.selectedCategory) {
-        filteredList = filteredList.filter(product =>
-          (product.category === this.selectedCategory)
-        );
+        const BY_CATEGORY = await axios.get(`${Global.api}/products/category/${this.selectedCategory}?limit=${this.limitPages}&skip=0`);
+        filteredList = BY_CATEGORY.data.products;
       }
 
       // Filtro de porcentaje
@@ -272,11 +271,11 @@ export default {
     },
 
     async selectProduct(product) {
+      this.isCartVisible = true;
       console.log("handleAddToCart:", product);
       this.itemStoredInCart.push(product);
-      console.log("listado de productos:", this.itemStoredInCart);
-      this.$emit('close-modal');
-    }
+      console.log("listado de productos:", this.itemStoredInCart);    
+    },
   },
 
   watch: {

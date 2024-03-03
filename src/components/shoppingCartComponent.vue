@@ -10,7 +10,7 @@
         <div class="items-list">
             <div v-if="cartItems.length > 0">
                 <div v-for="(item, index) in cartItems" :key="index">    
-                    <pre>{{item}}</pre>                
+                    <!-- <pre>{{item}}</pre>                 -->
                     <h3>{{ item.title }}</h3>
                     <h3>{{ item.brand }}</h3>
                     <h3>$ {{ item.price }} USD</h3>
