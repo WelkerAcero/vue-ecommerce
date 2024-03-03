@@ -1,47 +1,37 @@
 <template>
   <header class="navbar-dark bg-dark">
     <div class="d-flex row">
-      <!-- Primera fila -->
-      <div class="d-flex justify-content-around align-items-center p-3">
-        <!-- Logo -->
+
+      <div class="d-flex justify-content-around align-items-center p-3 hea--component">
         <div class="mx-2">
           <img src="../assets/img/logo.svg" width="50" class="image-transition">
         </div>
-
-        <!-- Barra de búsqueda -->
-        <form class="input-group px-2">
-          <input type="text" class="form-control" placeholder="Buscar productos, marcas y más" />
+        <form class="input-group px-2 hea--search">
+          <input type="text" class="form-control" placeholder="Search products, brands and more" />
           <button class="btn btn-outline-light" type="button">Search</button>
         </form>
-
-        <!-- Login -->
         <div class="px-2">
           <button class="btn btn-outline-light">Login</button>
         </div>
       </div>
 
-      <!-- Segunda fila -->
       <div class="d-flex align-items-center justify-content-between">
-        <!-- Opciones de navegación -->
         <ul class="nav">
-          <RouterLink class="nav-item" to="/">
+          <RouterLink class="nav-item" to="/" :class="{ 'active': $route.path === '/' }">
             <button class="btn btn-primary">Products</button>
           </RouterLink>
-          <RouterLink class="nav-item" to="/promotions">
+          <RouterLink class="nav-item" to="/promotions" :class="{ 'active': $route.path === '/promotions' }">
             <button class="btn btn-primary">Promotions</button>
           </RouterLink>
-          <RouterLink class="nav-item" to="/contact">
+          <RouterLink class="nav-item" to="/contact" :class="{ 'active': $route.path === '/contact' }">
             <button class="btn btn-primary">Contact</button>
           </RouterLink>
         </ul>
-        <!-- Iconos -->
         <div class="d-flex align-items-center">
           <a href="#" class="icon-link">
             <i class="bi bi-bell-fill icon"></i>
           </a>
-          <a href="#" class="icon-link">
-            <i class="bi bi-cart-fill icon"></i>
-          </a>
+          <shoppingCart :is-visible="isCartVisible" @toggleCart="toggleCartVisibility" :objAdded="itemsAdded"/>
         </div>
       </div>
     </div>
@@ -52,9 +42,25 @@
 import shoppingCart from './shoppingCartComponent.vue';
 export default {
   name: "Menu",
-
   components: {
     shoppingCart,
+  },
+  props: {
+      itemsAdded: Array,
+      close: Boolean,
+    }, 
+  data() {
+    return {
+      isCartVisible: false,
+    }
+  },
+  methods: {
+    toggleCartVisibility() {
+      this.isCartVisible = !this.isCartVisible;
+    }
+  },
+  mounted() {
+    console.log("mounted",this.close);
   }
 };
 </script>
@@ -73,29 +79,19 @@ export default {
   margin: 10px;
 }
 
-.icon-link {
-  text-decoration: none;
-  background-color: $main-col;
-  padding: 8px;
-  border-radius: 50%;
-  margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+.active {
+  border: 2px solid white;
+  border-radius: 5px;
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: $third-col;
-}
+@media(max-width: 700px) {
+  .hea--component {
+    display: flex;
+    flex-wrap: wrap;
+  }
 
-.icon-link:hover {
-  transform: scale(1.2);
-  opacity: 0.8;
+  .hea--search {
+    margin: 10px;
+  }
 }
 </style>
