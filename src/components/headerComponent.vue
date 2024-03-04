@@ -27,10 +27,10 @@
             <button class="btn btn-primary">Contact</button>
           </RouterLink>
         </ul>
-        <div class="d-flex align-items-center">
-          <a href="#" class="icon-link">
+        <div class="d-flex align-items-center mx-2">
+          <a href="#" class="icon-link me-5">
             <i class="bi bi-bell-fill icon"></i>
-          </a>
+          </a>          
           <shoppingCart :is-visible="isCartVisible" @toggleCart="toggleCartVisibility" :objAdded="itemsAdded"/>
         </div>
       </div>
@@ -47,7 +47,6 @@ export default {
   },
   props: {
       itemsAdded: Array,
-      cerrar: Boolean, 
     }, 
   data() {
     return {
@@ -57,8 +56,6 @@ export default {
   methods: {
     toggleCartVisibility() {
       this.isCartVisible = !this.isCartVisible;
-      console.log("cerrar desde header", this.cerrar);
-      this.$emit('toggleCart',this.cerrar);
     },   
   },
 };
