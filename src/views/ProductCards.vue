@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" :cerrar="this.isCartVisible"/>
+    <headerComponent :itemsAdded="itemStoredInCart" />
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -18,13 +18,17 @@
           <label for="categorySelect" class="form-label">Categories</label>
           <select id="categorySelect" class="form-select" v-model="selectedCategory" @click="applyFilters"
             style="width:12rem;">
-            <option disabled :value=null>Select a category</option>
+            <option selected :value=null>Select a category</option>
+            <option value="All">
+              All
+            </option>
             <option v-for="(category, index) in categories" :key="index" :value="category">
               {{ category }}
             </option>
           </select>
         </div>
 
+        <br>
         <div>
           <div>
             <label for="priceRange" class="form-label">Price range:</label>
@@ -40,6 +44,7 @@
           </div>
         </div>
 
+        <br>
         <div>
           <label for="discountsRange" class="form-label">Discount range:</label>
           <div class="d-flex center">
@@ -51,6 +56,7 @@
           </div>
         </div>
 
+        <br>
         <div>
           <label for="ratingFilter" class="form-label">Rating:</label>
           <div class="d-flex center">
@@ -59,6 +65,7 @@
           </div>
         </div>
 
+        <br>
         <div>
           <label for="stockFilter" class="form-label">Stock:</label>
           <div class="d-flex center">
@@ -67,6 +74,7 @@
           </div>
         </div>
 
+        <br>
         <div>
           <label for="brandFilter" class="form-label">Brand name:</label>
           <div class="d-flex center">
@@ -82,14 +90,27 @@
           <div class="card" style="width: 18rem;">
             <img :src="product.thumbnail" :alt="product.title" class="card-img-top" height="200px" width="200px" />
             <div class="card-body">
+              <p class="product-discountPercentage">
+                <b>- {{ parseFloat(product.discountPercentage) }}%</b>
+              </p>
+              <!-- Rating con estrellas -->
+              <div class="product-rating">
+                <span v-for="i in 5" :key="i"
+                  :class="{ 'filled-star': i <= product.rating, 'empty-star': i > product.rating }">&#9733;</span>
+                {{ product.rating }}
+              </div>
               <h4 class="product-name">{{ this.truncatedText(product.title, 18) }}</h4>
-              <p class="product-price">$ {{ product.price }} USD</p>
+              <p class="product-price">
+                <span class="original-price" v-if="product.discountPercentage > 0">$ {{ product.price }} USD</span>
+                <span class="discounted-price">$ {{ calculateDiscountedPrice(product.price, product.discountPercentage)
+                  }} USD x Unit</span>
+              </p>
               <p class="product-description">{{ this.truncatedText(product.description, 62) }}</p>
               <p class="product-stock">Stock: {{ product.stock }}</p>
               <p class="product-brand">Brand: {{ product.brand }}</p>
               <p class="product-category">Category: {{ product.category }}</p>
             </div>
-            <button class="btn btn-primary" @click="selectProduct(product)">Agregar al carrito</button>
+            <button class="btn btn-primary" @click="selectProduct(product)">Add to cart</button>
           </div>
         </div>
 
@@ -153,7 +174,7 @@ export default {
       skipPages: 0, //show the total amount of pages
     }
   },
-  methods: {   
+  methods: {
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -195,9 +216,12 @@ export default {
       }
 
       // Aplica el filtro de categoría
-      if (this.selectedCategory) {
+      if (this.selectedCategory != 'All') {
         const BY_CATEGORY = await axios.get(`${Global.api}/products/category/${this.selectedCategory}?limit=${this.limitPages}&skip=0`);
         filteredList = BY_CATEGORY.data.products;
+        this.totalPages = Math.floor(await BY_CATEGORY.data.total / this.limitPages);
+      } else {
+        await this.getProducts();
       }
 
       // Filtro de porcentaje
@@ -270,18 +294,21 @@ export default {
       this.isDarkTheme = !this.isDarkTheme;
     },
 
-    async selectProduct(product) {
-      this.isCartVisible = true;
-      console.log("handleAddToCart:", product);
-      this.itemStoredInCart.push(product);
-      console.log("listado de productos:", this.itemStoredInCart);    
+    calculateDiscountedPrice(originalPrice, discountPercentage) {
+      // Función para calcular el precio con descuento
+      const discountAmount = (originalPrice * discountPercentage) / 100;
+      return (originalPrice - discountAmount).toFixed(2); // Redondear a 2 decimales
     },
+
+    async selectProduct(product) {
+      this.itemStoredInCart.push(product);
+      console.log("listado de productos:", this.itemStoredInCart);
+    },
+
   },
 
   watch: {
-    products() {
-      this.totalPages = Math.ceil(this.products.length / this.perPage);
-    },
+
   },
 
   async mounted() {
@@ -341,6 +368,46 @@ export default {
 }
 
 /* ******************************** */
+.product-discountPercentage {
+  padding: 10px 10px;
+  display: inline-block;
+  background-color: red;
+  color: white;
+  border-radius: 100%;
+  position: absolute;
+  margin: -70px 10px;
+  right: 0;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #888;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+}
+
+.discounted-price {
+  display: flex;
+  justify-content: center;
+  color: $third-col;
+}
+
+.product-rating {
+  color: $fifth-col;
+  /* Color de las estrellas */
+  text-align: end;
+}
+
+.filled-star {
+  color: #ffd700;
+  /* Color de las estrellas rellenas */
+}
+
+.empty-star {
+  color: #ccc;
+  /* Color de las estrellas vacías */
+}
 
 .categories-column {
   position: sticky;
