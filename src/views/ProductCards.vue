@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" />
+    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart"/>
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -182,7 +182,7 @@ export default {
       selectedProduct: null
     }
   },
-  methods: {
+  methods: {   
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -309,8 +309,19 @@ export default {
     },
 
     async selectProduct(product) {
-      this.itemStoredInCart.push(product);
+      // Verificar si el producto ya está en el carrito
+      const existingProductIndex = this.itemStoredInCart.findIndex(item => item.id === product.id);
+      if (existingProductIndex !== -1) {
+          // Si el producto ya está en el carrito, incrementar la cantidad
+          this.itemStoredInCart[existingProductIndex].quantity++;
+      } else {
+          // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
+          const productWithQuantity = { ...product, quantity: 1 };
+          this.itemStoredInCart.push(productWithQuantity);
+      }
+
       console.log("listado de productos:", this.itemStoredInCart);
+  
 
       await Swal.fire({
         position: 'top-end',
@@ -321,6 +332,14 @@ export default {
         timerProgressBar: true,
         toast: true
       });
+    },
+
+    removeItemFromCart(index) {
+            this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
+    },
+
+    clearCart() {
+            this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
     },
 
     openDetailsModal(product) {

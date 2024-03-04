@@ -31,7 +31,7 @@
           <a href="#" class="icon-link me-5">
             <i class="bi bi-bell-fill icon"></i>
           </a>          
-          <shoppingCart :is-visible="isCartVisible" @toggleCart="toggleCartVisibility" :objAdded="itemsAdded"/>
+          <shoppingCart :is-visible="isCartVisible" @toggleCart="toggleCartVisibility" :objAdded="itemsAdded" @removeItem="handleRemoveItem" @clearCart="handleClearCart"/>
         </div>
       </div>
     </div>
@@ -57,6 +57,12 @@ export default {
     toggleCartVisibility() {
       this.isCartVisible = !this.isCartVisible;
     },   
+    handleRemoveItem(index) {
+      this.$emit('removeItem', index); // Reemitir el evento hacia el componente padre
+    },
+    handleClearCart() {
+      this.$emit('clearCart'); // Reemitir el evento hacia el componente padre
+    }
   },
 };
 </script>

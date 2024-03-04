@@ -10,14 +10,16 @@
         </div>
         <div class="items-list">
             <div v-if="cartItems.length > 0">
+                <!-- <pre>{{cartItems}}</pre> -->
                 <div v-for="(item, index) in cartItems" :key="index" class="d-flex shop--list--products">
                     <!-- <pre>{{item}}</pre> -->
+                    <i class="bi bi-x-square fs-5 mt-4 me-1" style="color: red;" @click="removeItem(index)"></i>
                     <div>
                         <img :src="item.thumbnail" :alt="item.title" class="card-img-top" width="50" height="50" />
                         <p><strong>Brand: </strong>{{ item.brand }}</p>
                     </div>
                     <div>
-                        <h5>{{ item.title }} </h5>
+                        <h6>{{ item.title }} </h6>
                         <p style="color: #fba834;">${{ item.price }} USD <span v-if="item.discountPercentage > 0"> - {{
         item.discountPercentage }} %</span></p>
 
@@ -39,9 +41,9 @@
                         <h5>Subtotal</h5>
                         <h5>$ {{ calculateSubtotal() }} USD</h5>
                     </div>
-                    <RouterLink to="/shopping-cart" class="btn btn-primary m-4" style="width: 250px;">Go to shopping
-                        cart
+                    <RouterLink to="/shopping-cart" class="btn btn-primary mx-4" style="width: 250px;">Go to shopping cart <i class="bi bi-box-arrow-right"></i>
                     </RouterLink>
+                    <button class="btn btn-danger m-4" style="width: 250px;" @click="clearCart"><i class="bi bi-trash3"></i> Empty Cart</button>
                 </div>
             </div>
             <div v-else class="shop--no--products">
@@ -66,10 +68,9 @@ export default {
     data() {
         return {
             cartItems: [],
-            displayItems: false,
         }
     },
-    emits: ['toggleCart'],
+    emits: ['toggleCart', 'removeItem', 'clearCart'],
     methods: {
         increaseQuantity(index) {
             if (this.cartItems[index].quantity < this.cartItems[index].stock) {
@@ -90,55 +91,33 @@ export default {
                 console.log("QUANTITY_BY_PROD:", QUANTITY_BY_PROD, "TOTAL_DISCOUNT:", TOTAL_DISCOUNT);
                 subtotal += QUANTITY_BY_PROD - TOTAL_DISCOUNT;
             }
+            console.log("subtotal:", subtotal);
             return subtotal.toFixed(2); // Redondear a 2 decimales
         },
 
         toggleCartVisibility() {
-            this.displayItems = true; // Siempre muestra el contenido cuando se hace clic en el carrito
             this.$emit('toggleCart'); // Emitir evento para abrir/cerrar el modal del carrito
             console.log("this.objAdded", this.objAdded);
-            // Verificar si objAdded tiene un valor antes de agregarlo a cartItems
             if (this.objAdded.length > 0) {
-                // Iterar sobre los productos agregados
-                for (let i = 0; i < this.objAdded.length; i++) {
-                    let same = false;
-                    if (this.cartItems.length > 0) {
-                        this.cartItems.forEach(e => {
-                            if (e.id === this.objAdded[i].id) {
-                                e.quantity += 1;
-                                same = true;
-                            }
-                        });
-                    }
-
-                    if (same) continue;
-
-                    // Inicializar la cantidad en 1 para cada producto
-                    const PRODUCT_QUANTITY = { ...this.objAdded[i], quantity: 1 };
-                    // Agregar el producto al carrito
-                    this.cartItems.push(PRODUCT_QUANTITY);
-                }
+                this.cartItems=this.objAdded;
+                console.log("this.cartItems", this.cartItems);
             }
         },
 
-        closeCart() {
-            this.displayItems = false;
-            this.$emit('toggleCart');
+        removeItem(index) {
+        this.cartItems.splice(index, 1); // Eliminar el producto del array cartItems
+        this.$emit('removeItem', index); // Emitir un evento para indicar que se ha eliminado un producto
         },
-        /*         calculateTotal() {
-                    return this.cartItems.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-                }, */
-    },
-    // watch: {
-    //     objAdded: {
-    //         immediate: true, // Para que se ejecute la primera vez al inicio
-    //         handler(newVal, oldVal) {
-    //             if (newVal !== oldVal) {
-    //                 this.cartItems = [...newVal]; // Actualiza cartItems cuando objAdded cambia
-    //             }
-    //         }
-    //     }
-    // }
+
+        clearCart() {
+            this.cartItems = []; // Vaciar el carrito
+            this.$emit('clearCart'); // Emitir evento para notificar que el carrito ha sido vaciado
+        },
+
+        closeCart() {
+            this.$emit('toggleCart');
+        },      
+    },   
 }
 </script>
 
@@ -183,8 +162,8 @@ export default {
 }
 
 .shop--list--products {
-    border-bottom: 1px solid black;
-    justify-content: space-evenly;
+    border-bottom: 1px solid rgb(210, 208, 208);
+    justify-content: space-between;
     margin: 10px;
     padding: 10px;
 }

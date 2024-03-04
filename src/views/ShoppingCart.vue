@@ -19,8 +19,6 @@
     <div class="step-content">
       <!-- Paso 1: Datos del carrito -->
       <div v-if="currentStep === 1">
-        <!-- Contenido del primer paso -->
-        <!-- Botón para continuar al siguiente paso -->
         <button @click="nextStep">Continuar</button>
       </div>
 
@@ -49,17 +47,19 @@
 <script>
 import headerComponent from "@/components/headerComponent.vue";
 import footerComponent from "@/components/footerComponent.vue";
+
 export default {
   name: "shopping-cart",
   components: {   
     headerComponent,
-    footerComponent,   
+    footerComponent, 
   },
   data() {
     return {
-      currentStep: 1
+      currentStep: 1,
     };
   },
+  
   methods: {
     nextStep() {
       if (this.currentStep < 3) {
@@ -71,7 +71,7 @@ export default {
         this.currentStep--;
       }
     }
-  }
+  },
 }
 </script>
 
