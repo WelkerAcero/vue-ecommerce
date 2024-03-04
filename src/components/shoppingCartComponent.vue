@@ -20,8 +20,11 @@
                     </div>
                     <div>
                         <h6>{{ item.title }} </h6>
-                        <p style="color: #fba834;">${{ item.price }} USD <span v-if="item.discountPercentage > 0"> - {{
-        item.discountPercentage }} %</span></p>
+                        <p style="color: #fba834;">${{ item.price }} USD
+                            <span v-if="item.discountPercentage > 0">
+                                - {{ item.discountPercentage }} %
+                            </span>
+                        </p>
 
                         <div class="quantity-controls">
 
@@ -41,9 +44,11 @@
                         <h5>Subtotal</h5>
                         <h5>$ {{ calculateSubtotal() }} USD</h5>
                     </div>
-                    <RouterLink to="/shopping-cart" class="btn btn-primary mx-4" style="width: 250px;">Go to shopping cart <i class="bi bi-box-arrow-right"></i>
+                    <RouterLink to="/shopping-cart" class="btn btn-primary mx-4" style="width: 250px;">Go to shopping
+                        cart <i class="bi bi-box-arrow-right"></i>
                     </RouterLink>
-                    <button class="btn btn-danger m-4" style="width: 250px;" @click="clearCart"><i class="bi bi-trash3"></i> Empty Cart</button>
+                    <button class="btn btn-danger m-4" style="width: 250px;" @click="clearCart"><i
+                            class="bi bi-trash3"></i> Empty Cart</button>
                 </div>
             </div>
             <div v-else class="shop--no--products">
@@ -99,14 +104,14 @@ export default {
             this.$emit('toggleCart'); // Emitir evento para abrir/cerrar el modal del carrito
             console.log("this.objAdded", this.objAdded);
             if (this.objAdded.length > 0) {
-                this.cartItems=this.objAdded;
+                this.cartItems = this.objAdded;
                 console.log("this.cartItems", this.cartItems);
             }
         },
 
         removeItem(index) {
-        this.cartItems.splice(index, 1); // Eliminar el producto del array cartItems
-        this.$emit('removeItem', index); // Emitir un evento para indicar que se ha eliminado un producto
+            this.cartItems.splice(index, 1); // Eliminar el producto del array cartItems
+            this.$emit('removeItem', index); // Emitir un evento para indicar que se ha eliminado un producto
         },
 
         clearCart() {
@@ -116,8 +121,8 @@ export default {
 
         closeCart() {
             this.$emit('toggleCart');
-        },      
-    },   
+        },
+    },
 }
 </script>
 

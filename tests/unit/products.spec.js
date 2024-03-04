@@ -1,4 +1,5 @@
-/* import { shallowMount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import shoppingCartComponent from "@/components/shoppingCartComponent.vue";
 
 describe('shoppingCartComponent.vue', () => {
@@ -10,8 +11,4 @@ describe('shoppingCartComponent.vue', () => {
 
         expect(WRAPPER.text()).toMatch(ITEMS);
     })
-}) */
-
-test('should 1 + 2 = 3', () => {
-    expect(1 + 2).toBe(3);
-});
+})

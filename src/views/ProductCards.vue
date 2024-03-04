@@ -109,10 +109,7 @@
               <p class="product-brand">Brand: {{ product.brand }}</p>
               <p class="product-category">Category: {{ product.category }}</p>
             </div>
-<<<<<<< HEAD
-=======
             <button class="btn btn-info" @click="openDetailsModal(product)">See details</button>
->>>>>>> 422daac9540139f5fc25585f11b2f20221c20112
             <button class="btn btn-primary" @click="selectProduct(product)">Add to cart</button>
           </div>
         </div>
@@ -185,7 +182,7 @@ export default {
       selectedProduct: null
     }
   },
-  methods: {
+  methods: {   
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -355,12 +352,6 @@ export default {
       this.isDetailsModalOpen = false;
       this.selectedProduct = null;
     },
-
-    async selectProduct(product) {
-      this.itemStoredInCart.push(product);
-      console.log("listado de productos:", this.itemStoredInCart);
-    },
-
   },
 
   watch: {
