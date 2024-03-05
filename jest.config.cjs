@@ -1,7 +1,8 @@
+// jest.config.js
 module.exports = {
-    preset:'@vue/cli-plugin-unit-jest',
-    transform: {
-      '^.+\\.jsx?$': 'babel-jest',
-      '^.+\\.tsx?$': 'babel-jest',
-    },
-}
+  // Otros ajustes de Jest...
+  transform: {
+    '^.+\\.vue$': '@vue/vue3-jest',
+    '^.+\\.js$': 'babel-jest',
+  },
+};

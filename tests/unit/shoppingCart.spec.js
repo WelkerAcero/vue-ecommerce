@@ -1,6 +1,6 @@
 import { shallowMount } from "@vue/test-utils";
 //import { mount } from "@vue/test-utils";
-import ShoppingCart from '@/components/shoppingCartComponent.vue';
+const ShoppingCart = require("@/components/shoppingCartComponent.vue");
 
 describe('ShoppingCartComponent.vue', () => {
     it('Renders correctly when isVisible is true', () => {
