@@ -45,8 +45,22 @@ npm install axios
 ```
 
 ### Decisiones de diseño
+Componentes y Vistas:
+Los componentes están organizados en las carpetas components y views, siguiendo las mejores prácticas de Vue.
+Se han creado componentes reutilizables como footerComponent, headerComponent, shoppingCartComponent, etc.
+Las vistas principales como ProductCards, ProductDetails, y ShoppingCart están definidas en archivos separados para facilitar la gestión y el mantenimiento del código.
+
+Estilos y Diseño:
+Se han utilizado variables SCSS (_variables.scss) para mantener una consistencia en los estilos y facilitar su mantenimiento.
+La elección del color se basa en una paleta de colores de Color Hunt para garantizar una estética atractiva y coherente en toda la aplicación.
+Las imágenes son de Undraw y los iconos son de Bootstrap 5, elegidos por su disponibilidad gratuita y calidad.
+La fuente se elige de Google Fonts para una mejor legibilidad y estética del texto en la aplicación.
+
+Funcionalidad:
+La aplicación es una tienda de comercio electrónico con funcionalidades completas como filtros, paginación, visualización de detalles de productos, y gestión del carrito de compras.
+Se ha incluido la capacidad de cambiar el tema de la página principal para adaptarse a las preferencias del usuario.
 En el proyecto de la aplicación web de comercio electrónico, se han tomado varias decisiones de diseño para mejorar la experiencia del usuario y la estética general del sitio. 
-Aquí hay una breve descripción de algunas de esas decisiones:
+
 *  Cartas de productos con estilos de Bootstrap 5.3: Utilizar cartas para mostrar los productos proporciona una presentación organizada y atractiva de los artículos disponibles. Al aprovechar los estilos de Bootstrap 5.3, se garantiza una apariencia coherente y compatible en diferentes dispositivos y navegadores.
 *  Carrito de compras en la esquina superior derecha: Colocar el carrito de compras en una ubicación destacada, como la esquina superior derecha del encabezado, facilita su acceso para los usuarios. La capacidad de hacer clic en el carrito y ver los elementos agregados de manera rápida y conveniente mejora la usabilidad del sitio.
 *  Paginación con estilos de Bootstrap 5.3: La paginación es fundamental para sitios con grandes cantidades de productos, ya que permite a los usuarios navegar por los resultados de búsqueda de manera eficiente. Al implementar la paginación con estilos de Bootstrap 5.3, se garantiza una apariencia limpia y moderna que se integra bien con el diseño general del sitio.
