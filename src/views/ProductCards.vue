@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart"/>
+    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart" />
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -165,6 +165,7 @@ export default {
       selectedStock: null,
       selectedBrand: null,
       products: [],
+      allProducts: [],
       categories: [],
       filteredProducts: [],
       itemStoredInCart: [],
@@ -183,6 +184,18 @@ export default {
     }
   },
   methods: {
+    async getAllProducts() {
+      try {
+        let response = await axios.get(`${Global.api}/products?limit=0&skip=0`);
+        if (response.status === 200) {
+          this.allProducts = response.data.products;
+        }
+      } catch (error) {
+        console.error("Error al obtener los productos:", error);
+        this.errorMessage = "Error al obtener los productos";
+      }
+    },
+
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -215,9 +228,12 @@ export default {
 
     async applyFilters() {
       // Aplica los filtros seleccionados a la lista de productos
-      let filteredList = [...this.products]; // Copia la lista original de productos
+      let filteredList = [...this.allProducts]; // Copia la lista original de productos
       // Aplica el filtro de precio
       if (this.minPriceSelected !== null && this.maxPriceSelected !== null) {
+        const BY_PRICE = await axios.get(`${Global.api}/products?limit=100&skip=0`);
+        filteredList = BY_PRICE.data.products;
+
         filteredList = filteredList.filter(product =>
           (product.price >= this.minPriceSelected && product.price <= this.maxPriceSelected)
         );
@@ -234,6 +250,9 @@ export default {
 
       // Filtro de porcentaje
       if (this.selectedMinPercentage && this.selectedMaxPercentage) {
+        const BY_PERCENTAGE = await axios.get(`${Global.api}/products?limit=100&skip=0`);
+        filteredList = BY_PERCENTAGE.data.products;
+
         filteredList = filteredList.filter(product =>
           (product.discountPercentage >= this.selectedMinPercentage && product.discountPercentage <= this.selectedMaxPercentage)
         );
@@ -312,16 +331,16 @@ export default {
       // Verificar si el producto ya está en el carrito
       const existingProductIndex = this.itemStoredInCart.findIndex(item => item.id === product.id);
       if (existingProductIndex !== -1) {
-          // Si el producto ya está en el carrito, incrementar la cantidad
-          this.itemStoredInCart[existingProductIndex].quantity++;
+        // Si el producto ya está en el carrito, incrementar la cantidad
+        this.itemStoredInCart[existingProductIndex].quantity++;
       } else {
-          // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
-          const productWithQuantity = { ...product, quantity: 1 };
-          this.itemStoredInCart.push(productWithQuantity);
+        // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
+        const productWithQuantity = { ...product, quantity: 1 };
+        this.itemStoredInCart.push(productWithQuantity);
       }
 
       console.log("listado de productos:", this.itemStoredInCart);
-  
+
 
       await Swal.fire({
         position: 'top-end',
@@ -335,11 +354,11 @@ export default {
     },
 
     removeItemFromCart(index) {
-            this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
+      this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
     },
 
     clearCart() {
-            this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
+      this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
     },
 
     openDetailsModal(product) {
