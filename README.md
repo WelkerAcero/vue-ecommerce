@@ -44,7 +44,7 @@ npm install sass sass-loader@^12 fibers -D
 npm install axios
 ```
 
-### Desiciones de diseño
+### Decisiones de diseño
 En el proyecto de la aplicación web de comercio electrónico, se han tomado varias decisiones de diseño para mejorar la experiencia del usuario y la estética general del sitio. 
 Aquí hay una breve descripción de algunas de esas decisiones:
 *  Cartas de productos con estilos de Bootstrap 5.3: Utilizar cartas para mostrar los productos proporciona una presentación organizada y atractiva de los artículos disponibles. Al aprovechar los estilos de Bootstrap 5.3, se garantiza una apariencia coherente y compatible en diferentes dispositivos y navegadores.
