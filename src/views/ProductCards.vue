@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" />
+    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart"/>
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -8,7 +8,6 @@
       </button>
     </div>
     <br>
-
     <div class="d-flex">
       <!-- <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div> -->
       <div class="categories-column">
@@ -110,9 +109,12 @@
               <p class="product-brand">Brand: {{ product.brand }}</p>
               <p class="product-category">Category: {{ product.category }}</p>
             </div>
+            <button class="btn btn-info" @click="openDetailsModal(product)">See details</button>
             <button class="btn btn-primary" @click="selectProduct(product)">Add to cart</button>
           </div>
         </div>
+
+        <productDetails :selectedProduct="selectedProduct" @closeModal="closeDetailsModal" v-if="isDetailsModalOpen" />
 
         <!-- Agregar controles de paginación -->
         <paginator :current_page="this.current_page" :pages="this.totalPages" @nextPage="nextPage"
@@ -130,6 +132,7 @@
 </template>
 
 <script lang="ts">
+declare var Swal: any;
 import axios from "axios";
 import { Global } from "@/config";
 import headerComponent from "@/components/headerComponent.vue";
@@ -137,6 +140,7 @@ import cartComponent from "@/components/shoppingCartComponent.vue";
 import footerComponent from "@/components/footerComponent.vue";
 import shoppingCart from "@/components/shoppingCartComponent.vue";
 import paginator from "@/components/product/paginatorComponent.vue";
+import productDetails from "./ProductDetails.vue";
 
 export default {
   name: "Products",
@@ -145,7 +149,8 @@ export default {
     headerComponent,
     footerComponent,
     cartComponent,
-    shoppingCart
+    shoppingCart,
+    productDetails
   },
   data() {
     return {
@@ -172,6 +177,9 @@ export default {
       totalPages: 0,
       current_page: 1,
       skipPages: 0, //show the total amount of pages
+
+      isDetailsModalOpen: false,
+      selectedProduct: null
     }
   },
   methods: {
@@ -295,9 +303,54 @@ export default {
     },
 
     calculateDiscountedPrice(originalPrice, discountPercentage) {
-      // Función para calcular el precio con descuento
       const discountAmount = (originalPrice * discountPercentage) / 100;
-      return (originalPrice - discountAmount).toFixed(2); // Redondear a 2 decimales
+      const PRICE_WITH_DISCOUNT = (originalPrice - discountAmount).toFixed(2);
+      return PRICE_WITH_DISCOUNT;
+    },
+
+    async selectProduct(product) {
+      // Verificar si el producto ya está en el carrito
+      const existingProductIndex = this.itemStoredInCart.findIndex(item => item.id === product.id);
+      if (existingProductIndex !== -1) {
+          // Si el producto ya está en el carrito, incrementar la cantidad
+          this.itemStoredInCart[existingProductIndex].quantity++;
+      } else {
+          // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
+          const productWithQuantity = { ...product, quantity: 1 };
+          this.itemStoredInCart.push(productWithQuantity);
+      }
+
+      console.log("listado de productos:", this.itemStoredInCart);
+  
+
+      await Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Product added to cart',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        toast: true
+      });
+    },
+
+    removeItemFromCart(index) {
+            this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
+    },
+
+    clearCart() {
+            this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
+    },
+
+    openDetailsModal(product) {
+      // Abrir el modal y establecer el producto seleccionado
+      this.isDetailsModalOpen = true;
+      this.selectedProduct = product;
+    },
+    closeDetailsModal() {
+      // Cerrar el modal y restablecer el producto seleccionado
+      this.isDetailsModalOpen = false;
+      this.selectedProduct = null;
     },
 
     async selectProduct(product) {

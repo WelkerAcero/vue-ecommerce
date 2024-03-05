@@ -11,6 +11,11 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/ProductCards.vue')
     },
+    {
+      path: '/shopping-cart',
+      name: 'shopping-cart',
+      component: () => import('../views/ShoppingCart.vue')
+    },
   ]
 })
 
