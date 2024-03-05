@@ -51,4 +51,8 @@ Aquí hay una breve descripción de algunas de esas decisiones:
 *  Carrito de compras en la esquina superior derecha: Colocar el carrito de compras en una ubicación destacada, como la esquina superior derecha del encabezado, facilita su acceso para los usuarios. La capacidad de hacer clic en el carrito y ver los elementos agregados de manera rápida y conveniente mejora la usabilidad del sitio.
 *  Paginación con estilos de Bootstrap 5.3: La paginación es fundamental para sitios con grandes cantidades de productos, ya que permite a los usuarios navegar por los resultados de búsqueda de manera eficiente. Al implementar la paginación con estilos de Bootstrap 5.3, se garantiza una apariencia limpia y moderna que se integra bien con el diseño general del sitio.
 *  Manejo de iconos: El uso de iconos proporciona una forma visualmente atractiva de comunicar información y funcionalidad a los usuarios. Al integrar un conjunto coherente de iconos en todo el sitio, se mejora la comprensión y la navegación del usuario. Se pueden usar bibliotecas de iconos como Font Awesome o Material Icons para una amplia selección de opciones y estilos.
+
+### Guía de pruebas: 
+Las pruebas no pudieron ser implementadas debido a errores :/ en la integración de las librerías con JEST  sin embargo se encuentra en una rama: testing
+
   
