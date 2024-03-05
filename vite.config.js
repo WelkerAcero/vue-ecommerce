@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-/*   base: 'https://welkeracero.github.io/vue-ecommerce/', */
+  /* base: 'https://welkeracero.github.io/vue-ecommerce/', */
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -1,5 +1,5 @@
 <template>
-    <a class="icon-link m-2" @click="toggleCartVisibility" style="position: fixed; right: 0px;z-index: 90;">
+    <a class="icon-link m-2 shop--icon" @click="toggleCartVisibility">
         <i class="bi bi-cart-fill icon"></i>
     </a>
     <div class="overlay" v-if="isVisible"></div>
@@ -10,25 +10,43 @@
         </div>
         <div class="items-list">
             <div v-if="cartItems.length > 0">
-                <div v-for="(item, index) in cartItems" :key="index" class="d-flex">
+                <!-- <pre>{{cartItems}}</pre> -->
+                <div v-for="(item, index) in cartItems" :key="index" class="d-flex shop--list--products">
                     <!-- <pre>{{item}}</pre> -->
+                    <i class="bi bi-x-square fs-5 mt-4 me-1" style="color: red;" @click="removeItem(index)"></i>
                     <div>
                         <img :src="item.thumbnail" :alt="item.title" class="card-img-top" width="50" height="50" />
+                        <p><strong>Brand: </strong>{{ item.brand }}</p>
                     </div>
                     <div>
-                        <h4>{{ item.title }}</h4>
-                        <h4>{{ item.brand }}</h4>
-                        <h5>$ {{ item.price }} USD</h5>
+                        <h6>{{ item.title }} </h6>
+                        <p style="color: #fba834;">${{ item.price }} USD <span v-if="item.discountPercentage > 0"> - {{
+        item.discountPercentage }} %</span></p>
+
                         <div class="quantity-controls">
-                            <button @click="decreaseQuantity(index)" :disabled="item.quantity === 1">-</button>
+
+                            <button @click="decreaseQuantity(index)" :disabled="item.quantity === 1"
+                                style="border-radius: 100%;font-size: 10px;">-</button>
+
                             <span>{{ item.quantity }}</span>
-                            <button @click="increaseQuantity(index)" :disabled="item.quantity === item.stock">+</button>
+
+                            <button @click="increaseQuantity(index)" :disabled="item.quantity === item.stock"
+                                style="border-radius: 100%;font-size: 10px;">+</button>
                         </div>
-                    </div>   
-                    <hr>                
-                </div>               
+                    </div>
+                </div>
+                <div class="position-absolute bottom-0 ">
+                    <hr>
+                    <div class="d-flex justify-content-between mx-4">
+                        <h5>Subtotal</h5>
+                        <h5>$ {{ calculateSubtotal() }} USD</h5>
+                    </div>
+                    <RouterLink to="/shopping-cart" class="btn btn-primary mx-4" style="width: 250px;">Go to shopping cart <i class="bi bi-box-arrow-right"></i>
+                    </RouterLink>
+                    <button class="btn btn-danger m-4" style="width: 250px;" @click="clearCart"><i class="bi bi-trash3"></i> Empty Cart</button>
+                </div>
             </div>
-            <div v-else style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <div v-else class="shop--no--products">
                 <div class="text-center">
                     <span>There are no products in the cart.</span>
                     <hr>
@@ -50,10 +68,9 @@ export default {
     data() {
         return {
             cartItems: [],
-            displayItems: false,
         }
     },
-    emits: ['toggleCart'],
+    emits: ['toggleCart', 'removeItem', 'clearCart'],
     methods: {
         increaseQuantity(index) {
             if (this.cartItems[index].quantity < this.cartItems[index].stock) {
@@ -65,47 +82,52 @@ export default {
                 this.cartItems[index].quantity--;
             }
         },
-        toggleCartVisibility() {
-            this.displayItems = true; // Siempre muestra el contenido cuando se hace clic en el carrito
-            this.$emit('toggleCart'); // Emitir evento para abrir/cerrar el modal del carrito
-            console.log("toggleCart", this.objAdded);
 
-            // Verificar si objAdded tiene un valor antes de agregarlo a cartItems
-            if (this.objAdded.length > 0) {
-                // Iterar sobre los productos agregados
-                this.objAdded.forEach(product => {
-                    // Inicializar la cantidad en 1 para cada producto
-                    const productWithQuantity = { ...product, quantity: 1 };
-                    // Agregar el producto al carrito
-                    this.cartItems.push(productWithQuantity);
-                });
+        calculateSubtotal() {
+            let subtotal = 0;
+            for (const item of this.cartItems) {
+                const QUANTITY_BY_PROD = item.price * item.quantity;
+                const TOTAL_DISCOUNT = (QUANTITY_BY_PROD * item.discountPercentage) / 100;
+                console.log("QUANTITY_BY_PROD:", QUANTITY_BY_PROD, "TOTAL_DISCOUNT:", TOTAL_DISCOUNT);
+                subtotal += QUANTITY_BY_PROD - TOTAL_DISCOUNT;
             }
-            console.log("toggleCart", this.cartItems);
+            console.log("subtotal:", subtotal);
+            return subtotal.toFixed(2); // Redondear a 2 decimales
+        },
+
+        toggleCartVisibility() {
+            this.$emit('toggleCart'); // Emitir evento para abrir/cerrar el modal del carrito
+            console.log("this.objAdded", this.objAdded);
+            if (this.objAdded.length > 0) {
+                this.cartItems=this.objAdded;
+                console.log("this.cartItems", this.cartItems);
+            }
+        },
+
+        removeItem(index) {
+        this.cartItems.splice(index, 1); // Eliminar el producto del array cartItems
+        this.$emit('removeItem', index); // Emitir un evento para indicar que se ha eliminado un producto
+        },
+
+        clearCart() {
+            this.cartItems = []; // Vaciar el carrito
+            this.$emit('clearCart'); // Emitir evento para notificar que el carrito ha sido vaciado
         },
 
         closeCart() {
-            this.displayItems = false;
             this.$emit('toggleCart');
-            this.cartItems = [];
-        },
-        /*         calculateTotal() {
-                    return this.cartItems.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-                }, */
-    },
-    // watch: {
-    //     objAdded: {
-    //         immediate: true, // Para que se ejecute la primera vez al inicio
-    //         handler(newVal, oldVal) {
-    //             if (newVal !== oldVal) {
-    //                 this.cartItems = [...newVal]; // Actualiza cartItems cuando objAdded cambia
-    //             }
-    //         }
-    //     }
-    // }
+        },      
+    },   
 }
 </script>
 
 <style lang="scss" scoped>
+.shop--icon {
+    position: fixed;
+    right: 0px;
+    z-index: 90;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -134,9 +156,16 @@ export default {
     height: 100vh;
     width: 300px;
     background-color: rgb(251, 251, 251);
-    z-index: 10;
+    z-index: 5;
     color: black;
     overflow: auto;
+}
+
+.shop--list--products {
+    border-bottom: 1px solid rgb(210, 208, 208);
+    justify-content: space-between;
+    margin: 10px;
+    padding: 10px;
 }
 
 .visible {
@@ -160,5 +189,12 @@ export default {
 .quantity-controls button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.shop--no--products {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 </style>
