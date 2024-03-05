@@ -353,10 +353,10 @@ export default {
       this.selectedProduct = null;
     },
 
-    async selectProduct(product) {
-      this.itemStoredInCart.push(product);
-      console.log("listado de productos:", this.itemStoredInCart);
-    },
+    // async selectProduct(product) {
+    //   this.itemStoredInCart.push(product);
+    //   console.log("listado de productos:", this.itemStoredInCart);
+    // },
 
   },
 
