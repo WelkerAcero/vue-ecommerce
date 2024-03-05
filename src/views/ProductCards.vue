@@ -141,6 +141,7 @@ import footerComponent from "@/components/footerComponent.vue";
 import shoppingCart from "@/components/shoppingCartComponent.vue";
 import paginator from "@/components/product/paginatorComponent.vue";
 import productDetails from "./ProductDetails.vue";
+import { productFeatures } from "../mixins/productFeaturesMixin.js";
 
 export default {
   name: "Products",
@@ -152,6 +153,8 @@ export default {
     shoppingCart,
     productDetails
   },
+  mixins:
+        [productFeatures],
   data() {
     return {
       minPrice: 10,
@@ -321,11 +324,7 @@ export default {
       this.isDarkTheme = !this.isDarkTheme;
     },
 
-    calculateDiscountedPrice(originalPrice, discountPercentage) {
-      const discountAmount = (originalPrice * discountPercentage) / 100;
-      const PRICE_WITH_DISCOUNT = (originalPrice - discountAmount).toFixed(2);
-      return PRICE_WITH_DISCOUNT;
-    },
+    
 
     async selectProduct(product) {
       // Verificar si el producto ya está en el carrito
@@ -440,30 +439,6 @@ export default {
 }
 
 /* ******************************** */
-.product-discountPercentage {
-  padding: 10px 10px;
-  display: inline-block;
-  background-color: red;
-  color: white;
-  border-radius: 100%;
-  position: absolute;
-  margin: -70px 10px;
-  right: 0;
-}
-
-.original-price {
-  text-decoration: line-through;
-  color: #888;
-  opacity: 0.5;
-  display: flex;
-  justify-content: center;
-}
-
-.discounted-price {
-  display: flex;
-  justify-content: center;
-  color: $third-col;
-}
 
 .product-rating {
   color: $fifth-col;
@@ -502,13 +477,7 @@ export default {
   .product-name {
     font-size: 18px;
     margin-bottom: 5px;
-  }
-
-  .product-price {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-  }
+  }  
 
   .product-description {
     font-size: 14px;
