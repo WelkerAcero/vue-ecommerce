@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart" />
+    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart"/>
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -82,38 +82,39 @@
           </div>
         </div>
       </div>
-
-      <div class="products-column row">
+      
+      <div>
         <h1>Product List</h1>
-        <div v-for="product in filteredProducts" :key="product.id" class="col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
-          <div class="card" style="width: 18rem;">
-            <img :src="product.thumbnail" :alt="product.title" class="card-img-top" height="200px" width="200px" />
-            <div class="card-body">
-              <p class="product-discountPercentage">
-                <b>- {{ parseFloat(product.discountPercentage) }}%</b>
-              </p>
-              <!-- Rating con estrellas -->
-              <div class="product-rating">
-                <span v-for="i in 5" :key="i"
-                  :class="{ 'filled-star': i <= product.rating, 'empty-star': i > product.rating }">&#9733;</span>
-                {{ product.rating }}
+        <div class="products-column">        
+          <div v-for="product in filteredProducts" :key="product.id" class="pro--cards">
+            <div class="card" style="width: 18rem;">
+              <img :src="product.thumbnail" :alt="product.title" class="card-img-top" height="200px" width="200px" />
+              <div class="card-body">
+                <p class="product-discountPercentage">
+                  <b>- {{ parseFloat(product.discountPercentage) }}%</b>
+                </p>
+                <!-- Rating con estrellas -->
+                <div class="product-rating">
+                  <span v-for="i in 5" :key="i"
+                    :class="{ 'filled-star': i <= product.rating, 'empty-star': i > product.rating }">&#9733;</span>
+                  {{ product.rating }}
+                </div>
+                <h4 class="product-name">{{ this.truncatedText(product.title, 18) }}</h4>
+                <p class="product-price">
+                  <span class="original-price" v-if="product.discountPercentage > 0">$ {{ product.price }} USD</span>
+                  <span class="discounted-price">$ {{ calculateDiscountedPrice(product.price, product.discountPercentage)
+                    }} USD x Unit</span>
+                </p>
+                <p class="product-description">{{ this.truncatedText(product.description, 62) }}</p>
+                <p class="product-stock"><i class="bi bi-basket-fill" style="color: green;"></i> Stock: {{ product.stock }}</p>
+                <p class="product-brand"><i class="bi bi-postcard-fill"  style="color: #8000EB;"></i> Brand: {{ product.brand }}</p>
+                <p class="product-category"><i class="bi bi-tags-fill"  style="color: blue;"></i> Category: {{ product.category }}</p>
               </div>
-              <h4 class="product-name">{{ this.truncatedText(product.title, 18) }}</h4>
-              <p class="product-price">
-                <span class="original-price" v-if="product.discountPercentage > 0">$ {{ product.price }} USD</span>
-                <span class="discounted-price">$ {{ calculateDiscountedPrice(product.price, product.discountPercentage)
-                  }} USD x Unit</span>
-              </p>
-              <p class="product-description">{{ this.truncatedText(product.description, 62) }}</p>
-              <p class="product-stock">Stock: {{ product.stock }}</p>
-              <p class="product-brand">Brand: {{ product.brand }}</p>
-              <p class="product-category">Category: {{ product.category }}</p>
+              <button class="btn btn-info" @click="openDetailsModal(product)"><i class="bi bi-card-text"></i> See details</button>
+              <button class="btn btn-primary" @click="selectProduct(product)"><i class="bi bi-cart-plus"></i> Add to cart</button>
             </div>
-            <button class="btn btn-info" @click="openDetailsModal(product)">See details</button>
-            <button class="btn btn-primary" @click="selectProduct(product)">Add to cart</button>
           </div>
-        </div>
-
+       </div>
         <productDetails :selectedProduct="selectedProduct" @closeModal="closeDetailsModal" v-if="isDetailsModalOpen" />
 
         <!-- Agregar controles de paginación -->
@@ -141,7 +142,6 @@ import footerComponent from "@/components/footerComponent.vue";
 import shoppingCart from "@/components/shoppingCartComponent.vue";
 import paginator from "@/components/product/paginatorComponent.vue";
 import productDetails from "./ProductDetails.vue";
-import { productFeatures } from "../mixins/productFeaturesMixin.js";
 
 export default {
   name: "Products",
@@ -153,8 +153,6 @@ export default {
     shoppingCart,
     productDetails
   },
-  mixins:
-        [productFeatures],
   data() {
     return {
       minPrice: 10,
@@ -168,7 +166,6 @@ export default {
       selectedStock: null,
       selectedBrand: null,
       products: [],
-      allProducts: [],
       categories: [],
       filteredProducts: [],
       itemStoredInCart: [],
@@ -186,19 +183,7 @@ export default {
       selectedProduct: null
     }
   },
-  methods: {
-    async getAllProducts() {
-      try {
-        let response = await axios.get(`${Global.api}/products?limit=0&skip=0`);
-        if (response.status === 200) {
-          this.allProducts = response.data.products;
-        }
-      } catch (error) {
-        console.error("Error al obtener los productos:", error);
-        this.errorMessage = "Error al obtener los productos";
-      }
-    },
-
+  methods: {   
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -231,12 +216,9 @@ export default {
 
     async applyFilters() {
       // Aplica los filtros seleccionados a la lista de productos
-      let filteredList = [...this.allProducts]; // Copia la lista original de productos
+      let filteredList = [...this.products]; // Copia la lista original de productos
       // Aplica el filtro de precio
       if (this.minPriceSelected !== null && this.maxPriceSelected !== null) {
-        const BY_PRICE = await axios.get(`${Global.api}/products?limit=100&skip=0`);
-        filteredList = BY_PRICE.data.products;
-
         filteredList = filteredList.filter(product =>
           (product.price >= this.minPriceSelected && product.price <= this.maxPriceSelected)
         );
@@ -253,9 +235,6 @@ export default {
 
       // Filtro de porcentaje
       if (this.selectedMinPercentage && this.selectedMaxPercentage) {
-        const BY_PERCENTAGE = await axios.get(`${Global.api}/products?limit=100&skip=0`);
-        filteredList = BY_PERCENTAGE.data.products;
-
         filteredList = filteredList.filter(product =>
           (product.discountPercentage >= this.selectedMinPercentage && product.discountPercentage <= this.selectedMaxPercentage)
         );
@@ -324,22 +303,26 @@ export default {
       this.isDarkTheme = !this.isDarkTheme;
     },
 
-    
+    calculateDiscountedPrice(originalPrice, discountPercentage) {
+      const discountAmount = (originalPrice * discountPercentage) / 100;
+      const PRICE_WITH_DISCOUNT = (originalPrice - discountAmount).toFixed(2);
+      return PRICE_WITH_DISCOUNT;
+    },
 
     async selectProduct(product) {
       // Verificar si el producto ya está en el carrito
       const existingProductIndex = this.itemStoredInCart.findIndex(item => item.id === product.id);
       if (existingProductIndex !== -1) {
-        // Si el producto ya está en el carrito, incrementar la cantidad
-        this.itemStoredInCart[existingProductIndex].quantity++;
+          // Si el producto ya está en el carrito, incrementar la cantidad
+          this.itemStoredInCart[existingProductIndex].quantity++;
       } else {
-        // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
-        const productWithQuantity = { ...product, quantity: 1 };
-        this.itemStoredInCart.push(productWithQuantity);
+          // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
+          const productWithQuantity = { ...product, quantity: 1 };
+          this.itemStoredInCart.push(productWithQuantity);
       }
 
       console.log("listado de productos:", this.itemStoredInCart);
-
+  
 
       await Swal.fire({
         position: 'top-end',
@@ -353,11 +336,11 @@ export default {
     },
 
     removeItemFromCart(index) {
-      this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
+            this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
     },
 
     clearCart() {
-      this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
+            this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
     },
 
     openDetailsModal(product) {
@@ -370,11 +353,6 @@ export default {
       this.isDetailsModalOpen = false;
       this.selectedProduct = null;
     },
-
-    // async selectProduct(product) {
-    //   this.itemStoredInCart.push(product);
-    //   console.log("listado de productos:", this.itemStoredInCart);
-    // },
 
   },
 
@@ -466,6 +444,13 @@ export default {
 .products-column {
   flex-grow: 1;
   overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pro--cards{
+  margin: 15px;
 }
 
 .error-message {
@@ -497,4 +482,5 @@ export default {
     width: 100%;
   }
 }
+
 </style>

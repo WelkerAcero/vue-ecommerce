@@ -17,11 +17,12 @@
                 <span class="original-price" v-if="selectedProduct.discountPercentage > 0">$ {{ selectedProduct.price }} USD</span>
                 <span class="discounted-price">$ {{ calculateDiscountedPrice(selectedProduct.price, selectedProduct.discountPercentage)
                   }} USD x Unit</span>
-              </p>              <li class="product-discountPercentage">{{ selectedProduct.discountPercentage }}%</li>
-              <li><i class="bi bi-star-fill text-yellow"></i> <strong>Valoración:</strong> {{ selectedProduct.rating }}</li>
-              <li><strong>Stock:</strong> {{ selectedProduct.stock }}</li>
-              <li><strong>Marca:</strong> {{ selectedProduct.brand }}</li>
-              <li><strong>Categoría:</strong> {{ selectedProduct.category }}</li>
+              </p>              
+              <li class="product-discountPercentage">{{ selectedProduct.discountPercentage }}%</li>
+              <li><i class="bi bi-star-fill" style="color: #ffd700;"></i> <strong>Rating:</strong> {{ selectedProduct.rating }}</li>
+              <li><i class="bi bi-basket-fill" style="color: green;"></i> <strong>Stock:</strong> {{ selectedProduct.stock }}</li>
+              <li><i class="bi bi-postcard-fill"  style="color: #8000EB;"></i> <strong>Brand:</strong> {{ selectedProduct.brand }}</li>
+              <li><i class="bi bi-tags-fill"  style="color: blue;"></i> <strong>Category:</strong> {{ selectedProduct.category }}</li>
             </ul>
           </div> 
           <div id="productImageCarousel" class="carousel slide" style="width: 200px;">
@@ -81,7 +82,7 @@ export default {
 
 .product-details-modal {
   max-width: 80%;
-  width: 80%;
+  width: 50%;
   height: fit-content;
   background-color: white;
   padding: 20px;
@@ -95,5 +96,12 @@ export default {
   width: 80%;
   margin: 0 auto;
   padding: 10px;
+}
+
+@media(max-width: 900px) {
+  .product-details-modal{
+    max-width: 80%;
+    width: 80%;
+  }
 }
 </style>

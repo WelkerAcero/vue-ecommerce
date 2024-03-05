@@ -5,10 +5,10 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/vue-ecommerce/',
   plugins: [
     vue(),
   ],
-  /* base: 'https://welkeracero.github.io/vue-ecommerce/', */
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
