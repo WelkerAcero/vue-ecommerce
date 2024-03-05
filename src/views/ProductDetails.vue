@@ -5,7 +5,7 @@
         <div class="d-inline text-end">
           <i class="bi bi-x-circle fs-3" @click="closeModal"></i>
         </div>   
-        <div class="text-center">   
+        <div class="text-center">  
           <h2>{{ selectedProduct.title }}</h2>
           <p >{{ selectedProduct.description }}</p>  
         </div>     

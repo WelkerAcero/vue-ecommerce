@@ -1,6 +1,7 @@
 <template>
   <headerComponent :itemsAdded="itemStoredInCart" />
   <div class="shopping-cart">
+    <br>
     <div class="step-indicator">
       <div class="step">
         <div :class="{ 'completed': currentStep >= 1 }">1</div>
@@ -19,25 +20,29 @@
     <div class="step-content">
       <!-- Paso 1: Datos del carrito -->
       <div v-if="currentStep === 1">
-        <button @click="nextStep">Continuar</button>
+        <button class="btn btn-info mx-3" @click="nextStep">Continue</button>
+        <div style="height: 300px;">
+
+        </div>        
       </div>
 
       <!-- Paso 2: Datos de envío -->
-      <div v-if="currentStep === 2">
-        <!-- Contenido del segundo paso -->
-        <!-- Botón para regresar al paso anterior -->
-        <button @click="prevStep">Atrás</button>
-        <!-- Botón para continuar al siguiente paso -->
-        <button @click="nextStep">Continuar</button>
+      <div v-if="currentStep === 2">   
+        <button class="btn btn-secondary mx-3" @click="prevStep">Back</button>  
+        <button class="btn btn-info mx-1" @click="nextStep">Continue</button>
+        <div style="height: 300px;">
+
+        </div>
       </div>
 
       <!-- Paso 3: Confirmar compra -->
       <div v-if="currentStep === 3">
-        <!-- Contenido del tercer paso -->
-        <!-- Botón para regresar al paso anterior -->
-        <button @click="prevStep">Atrás</button>
+        <button class="btn btn-secondary mx-3" @click="prevStep">Back</button>
         <!-- Botón para finalizar la compra -->
-        <button>Confirmar Compra</button>
+        <button class="btn btn-info mx-1">Confirm Purchase</button>
+        <div style="height: 300px;">
+
+        </div>
       </div>
     </div>
   </div>

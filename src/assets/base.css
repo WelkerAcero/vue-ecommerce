@@ -85,7 +85,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
+ /* Variables globales para usar en todo el proyecto */
 .product-discountPercentage {
   padding: 10px 10px;
   display: inline-block;

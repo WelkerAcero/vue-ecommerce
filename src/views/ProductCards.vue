@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'dark-theme': isDarkTheme, 'light-theme': !isDarkTheme }">
-    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart"/>
+    <headerComponent :itemsAdded="itemStoredInCart" @removeItem="removeItemFromCart" @clearCart="clearCart" />
     <div class="d-flex justify-content-end">
       <button @click="toggleTheme" style="border-radius: 20px; margin: 5px;width: 200px; position: relative;">
         <i :class="isDarkTheme ? 'bi bi-lightbulb-off-fill' : 'bi bi-lightbulb-fill custom-icon'"></i>
@@ -9,7 +9,6 @@
     </div>
     <br>
     <div class="d-flex">
-      <!-- <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div> -->
       <div class="categories-column">
         <h3 class="pt-5">Filters</h3>
         <hr>
@@ -82,10 +81,10 @@
           </div>
         </div>
       </div>
-      
+
       <div>
         <h1>Product List</h1>
-        <div class="products-column">        
+        <div class="products-column">
           <div v-for="product in filteredProducts" :key="product.id" class="pro--cards">
             <div class="card" style="width: 18rem;">
               <img :src="product.thumbnail" :alt="product.title" class="card-img-top" height="200px" width="200px" />
@@ -93,7 +92,6 @@
                 <p class="product-discountPercentage">
                   <b>- {{ parseFloat(product.discountPercentage) }}%</b>
                 </p>
-                <!-- Rating con estrellas -->
                 <div class="product-rating">
                   <span v-for="i in 5" :key="i"
                     :class="{ 'filled-star': i <= product.rating, 'empty-star': i > product.rating }">&#9733;</span>
@@ -102,28 +100,32 @@
                 <h4 class="product-name">{{ this.truncatedText(product.title, 18) }}</h4>
                 <p class="product-price">
                   <span class="original-price" v-if="product.discountPercentage > 0">$ {{ product.price }} USD</span>
-                  <span class="discounted-price">$ {{ calculateDiscountedPrice(product.price, product.discountPercentage)
+                  <span class="discounted-price">$ {{ calculateDiscountedPrice(product.price,
+    product.discountPercentage)
                     }} USD x Unit</span>
                 </p>
                 <p class="product-description">{{ this.truncatedText(product.description, 62) }}</p>
-                <p class="product-stock"><i class="bi bi-basket-fill" style="color: green;"></i> Stock: {{ product.stock }}</p>
-                <p class="product-brand"><i class="bi bi-postcard-fill"  style="color: #8000EB;"></i> Brand: {{ product.brand }}</p>
-                <p class="product-category"><i class="bi bi-tags-fill"  style="color: blue;"></i> Category: {{ product.category }}</p>
+                <p class="product-stock"><i class="bi bi-basket-fill" style="color: green;"></i> Stock: {{ product.stock
+                  }}</p>
+                <p class="product-brand"><i class="bi bi-postcard-fill" style="color: #8000EB;"></i> Brand: {{
+    product.brand }}</p>
+                <p class="product-category"><i class="bi bi-tags-fill" style="color: blue;"></i> Category: {{
+    product.category }}</p>
               </div>
-              <button class="btn btn-info" @click="openDetailsModal(product)"><i class="bi bi-card-text"></i> See details</button>
-              <button class="btn btn-primary" @click="selectProduct(product)"><i class="bi bi-cart-plus"></i> Add to cart</button>
+              <button class="btn btn-info" @click="openDetailsModal(product)"><i class="bi bi-card-text"></i> See
+                details</button>
+              <button class="btn btn-primary" @click="selectProduct(product)"><i class="bi bi-cart-plus"></i> Add to
+                cart</button>
             </div>
           </div>
-       </div>
+        </div>
         <productDetails :selectedProduct="selectedProduct" @closeModal="closeDetailsModal" v-if="isDetailsModalOpen" />
 
-        <!-- Agregar controles de paginación -->
+        <!-- Controles de paginación -->
         <paginator :current_page="this.current_page" :pages="this.totalPages" @nextPage="nextPage"
           @clickPage="clickPageNum" @previous="previousPage" />
       </div>
     </div>
-
-    <!-- Agrega la flecha al final del template -->
     <div class="scroll-to-top" :class="{ 'show-scroll-to-top': showScrollToTop }" @click="scrollToTop">
       <i class="bi bi-arrow-up-circle-fill"></i>
     </div>
@@ -166,6 +168,7 @@ export default {
       selectedStock: null,
       selectedBrand: null,
       products: [],
+      allProducts: [],
       categories: [],
       filteredProducts: [],
       itemStoredInCart: [],
@@ -177,13 +180,25 @@ export default {
       limitPages: 12,
       totalPages: 0,
       current_page: 1,
-      skipPages: 0, //show the total amount of pages
+      skipPages: 0,
 
       isDetailsModalOpen: false,
       selectedProduct: null
     }
   },
-  methods: {   
+  methods: {
+    // Funciones para obtener data
+    async getAllProducts() {
+      try {
+        let response = await axios.get(`${Global.api}/products?limit=0&skip=0`);
+        if (response.status === 200) {
+          this.allProducts = response.data.products;
+        }
+      } catch (error) {
+        console.error("Error al obtener los productos:", error);
+        this.errorMessage = "Error al obtener los productos";
+      }
+    },
     async getProducts(skipPages: number = 0) {
       try {
         let response = await axios.get(`${Global.api}/products?limit=${this.limitPages}&skip=${skipPages}`);
@@ -214,15 +229,11 @@ export default {
       }
     },
 
+    // Funciones de filtros de los productos
     async applyFilters() {
       // Aplica los filtros seleccionados a la lista de productos
       let filteredList = [...this.products]; // Copia la lista original de productos
-      // Aplica el filtro de precio
-      if (this.minPriceSelected !== null && this.maxPriceSelected !== null) {
-        filteredList = filteredList.filter(product =>
-          (product.price >= this.minPriceSelected && product.price <= this.maxPriceSelected)
-        );
-      }
+      let filteredListAll = [...this.allProducts]; // Copia la lista original de productos
 
       // Aplica el filtro de categoría
       if (this.selectedCategory != 'All') {
@@ -233,45 +244,52 @@ export default {
         await this.getProducts();
       }
 
+      // Aplica el filtro de precio
+      if (this.minPriceSelected !== null && this.maxPriceSelected !== null) {
+        filteredList = filteredListAll.filter(product =>
+          (product.price >= this.minPriceSelected && product.price <= this.maxPriceSelected)
+        );
+      }
+
       // Filtro de porcentaje
       if (this.selectedMinPercentage && this.selectedMaxPercentage) {
-        filteredList = filteredList.filter(product =>
+        filteredList = filteredListAll.filter(product =>
           (product.discountPercentage >= this.selectedMinPercentage && product.discountPercentage <= this.selectedMaxPercentage)
         );
       }
 
       // Filtro de Rating
       if (this.selectedRating) {
-        filteredList = filteredList.filter(product => (product.rating == this.selectedRating));
+        filteredList = filteredListAll.filter(product => (product.rating == this.selectedRating));
       }
 
       // Filtro de Rating
       if (this.selectedStock) {
-        filteredList = filteredList.filter(product => (product.stock == this.selectedStock));
+        filteredList = filteredListAll.filter(product => (product.stock <= this.selectedStock));
+        console.log("Rating:", filteredList);
       }
 
       if (this.selectedBrand) {
-        filteredList = filteredList.filter(product => (product.brand === this.selectedBrand));
+        filteredList = filteredListAll.filter(product => (product.brand === this.selectedBrand));
       }
 
       // Actualiza la lista de productos filtrados
       return this.filteredProducts = filteredList;
     },
 
+    // Función para truncar texto
     truncatedText(description: string, max: number) {
       // Computed property para truncar el texto si es necesario
       if (description.length > max) return description.slice(0, max) + "..."; // Agrega puntos suspensivos si el texto se trunca
       return description;
     },
 
-    // Agrega el nuevo método para manejar el scroll
+    // Funciones para llevar el usuario al menú
     handleScroll() {
       const scrollPosition = window.scrollY || document.documentElement.scrollTop;
       const scrollThreshold = 100;
       this.showScrollToTop = scrollPosition > scrollThreshold;
     },
-
-    // Define el método scrollToTop para llevar al usuario al inicio de la página
     scrollToTop() {
       window.scrollTo({
         top: 0,
@@ -279,18 +297,17 @@ export default {
       });
     },
 
+    // Funciones de paginación
     async clickPageNum(page: number) {
       this.skipPages = page * this.limitPages;
       await this.getProducts(this.skipPages);
       this.current_page = page;
     },
-
     async nextPage(page: number) {
       this.skipPages += this.limitPages;
       await this.getProducts(this.skipPages);
       this.current_page = page;
     },
-
     async previousPage(page: number) {
       if (this.skipPages > 0) {
         this.skipPages -= this.limitPages;
@@ -299,30 +316,28 @@ export default {
       }
     },
 
+    // Función de tema del proyecto
     toggleTheme() {
       this.isDarkTheme = !this.isDarkTheme;
     },
 
+    // Funciones de productos
     calculateDiscountedPrice(originalPrice, discountPercentage) {
       const discountAmount = (originalPrice * discountPercentage) / 100;
       const PRICE_WITH_DISCOUNT = (originalPrice - discountAmount).toFixed(2);
       return PRICE_WITH_DISCOUNT;
     },
-
     async selectProduct(product) {
       // Verificar si el producto ya está en el carrito
       const existingProductIndex = this.itemStoredInCart.findIndex(item => item.id === product.id);
       if (existingProductIndex !== -1) {
-          // Si el producto ya está en el carrito, incrementar la cantidad
-          this.itemStoredInCart[existingProductIndex].quantity++;
+        // Si el producto ya está en el carrito, incrementar la cantidad
+        this.itemStoredInCart[existingProductIndex].quantity++;
       } else {
-          // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
-          const productWithQuantity = { ...product, quantity: 1 };
-          this.itemStoredInCart.push(productWithQuantity);
+        // Si el producto no está en el carrito, agregarlo con una cantidad inicial de 1
+        const productWithQuantity = { ...product, quantity: 1 };
+        this.itemStoredInCart.push(productWithQuantity);
       }
-
-      console.log("listado de productos:", this.itemStoredInCart);
-  
 
       await Swal.fire({
         position: 'top-end',
@@ -335,21 +350,20 @@ export default {
       });
     },
 
+    // Funciones para remover y vaciar el carrito
     removeItemFromCart(index) {
-            this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
+      this.itemStoredInCart.splice(index, 1); // Eliminar el producto del array itemStoredInCart
     },
-
     clearCart() {
-            this.itemStoredInCart = []; // Vaciar el array de items del carrito en el componente padre
+      this.itemStoredInCart = []; // Vaciar el array de items del carrito en el archivo padre
     },
 
+    // Funciones para el modal de detalles del producto
     openDetailsModal(product) {
-      // Abrir el modal y establecer el producto seleccionado
       this.isDetailsModalOpen = true;
       this.selectedProduct = product;
     },
     closeDetailsModal() {
-      // Cerrar el modal y restablecer el producto seleccionado
       this.isDetailsModalOpen = false;
       this.selectedProduct = null;
     },
@@ -362,8 +376,8 @@ export default {
 
   async mounted() {
     await this.getProducts();
+    await this.getAllProducts();
     await this.getCategories();
-    // Llamar al método para obtener los datos paginados
 
     window.addEventListener("scroll", this.handleScroll);
   },
@@ -417,21 +431,17 @@ export default {
 }
 
 /* ******************************** */
-
-.product-rating {
-  color: $fifth-col;
-  /* Color de las estrellas */
-  text-align: end;
-}
-
 .filled-star {
   color: #ffd700;
-  /* Color de las estrellas rellenas */
 }
 
 .empty-star {
   color: #ccc;
-  /* Color de las estrellas vacías */
+}
+
+.product-rating {
+  color: $fifth-col;
+  text-align: end;
 }
 
 .categories-column {
@@ -449,20 +459,15 @@ export default {
   justify-content: center;
 }
 
-.pro--cards{
+.pro--cards {
   margin: 15px;
-}
-
-.error-message {
-  color: red;
-  margin-bottom: 20px;
 }
 
 .product-details {
   .product-name {
     font-size: 18px;
     margin-bottom: 5px;
-  }  
+  }
 
   .product-description {
     font-size: 14px;
@@ -477,10 +482,8 @@ export default {
     color: #888;
   }
 
-  /* Estilos opcionales */
   input[type="range"] {
     width: 100%;
   }
 }
-
 </style>

@@ -1,7 +1,6 @@
 <template>
   <header class="navbar-dark bg-dark">
     <div class="d-flex row">
-
       <div class="d-flex justify-content-around align-items-center p-3 hea--component">
         <div class="mx-2">
           <img src="../assets/img/logo.svg" width="50" class="image-transition">
@@ -58,10 +57,10 @@ export default {
       this.isCartVisible = !this.isCartVisible;
     },   
     handleRemoveItem(index) {
-      this.$emit('removeItem', index); // Reemitir el evento hacia el componente padre
+      this.$emit('removeItem', index);
     },
     handleClearCart() {
-      this.$emit('clearCart'); // Reemitir el evento hacia el componente padre
+      this.$emit('clearCart');
     }
   },
 };
